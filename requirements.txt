@@ -1,0 +1,40 @@
+# =============================================================================
+# ZX Bank Conversational AI — Python Dependencies
+# Python 3.10.0 | Windows | NVIDIA RTX 4050 (CUDA)
+# =============================================================================
+
+# --- API Framework -----------------------------------------------------------
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# --- LLM Client (OpenAI-compatible SDK for Requesty) ------------------------
+openai>=1.50.0
+
+# --- NLP & Embeddings --------------------------------------------------------
+sentence-transformers==5.2.2
+scikit-learn==1.7.2
+
+# --- Vector Search & Sparse Retrieval ----------------------------------------
+faiss-cpu>=1.7.4
+rank-bm25>=0.2.2
+
+# --- Document Processing -----------------------------------------------------
+langchain-text-splitters>=0.2.0
+
+# --- Data Validation & Configuration -----------------------------------------
+pydantic>=2.12.0
+pydantic-settings>=2.0.0
+python-dotenv>=1.0.0
+
+# --- Observability & Logging -------------------------------------------------
+structlog>=24.0.0
+rich>=13.0.0
+
+# --- HTTP Client -------------------------------------------------------------
+httpx>=0.26.0
+
+# --- Existing System Packages (DO NOT REINSTALL) ----------------------------
+# numpy==1.24.4          (pre-installed)
+# torch==2.10.0+cu130    (pre-installed)
+# tensorflow==2.10.1     (pre-installed)
+# protobuf==3.20.0       (pre-installed)

@@ -1,0 +1,49 @@
+# =============================================================================
+# ZX Bank AI — Git Ignore
+# =============================================================================
+
+# --- Environment & Secrets ---------------------------------------------------
+.env
+*.env.local
+
+# --- Python -------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# --- Virtual Environment -----------------------------------------------------
+venv/
+.venv/
+env/
+
+# --- IDE ----------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- OS -----------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Indexes (regenerated on build) ------------------------------------------
+indexes/*.faiss
+indexes/*.pkl
+indexes/*.json
+
+# --- Data (escalations are runtime-generated) ---------------------------------
+data/escalations/*.json
+
+# --- Reference Files (not part of the project) --------------------------------
+faiss-main/
+*.pdf
+Documentation requesty.txt
+Suggested references by yellow.ai from the document.txt
+ML-Intern-Assignment.txt

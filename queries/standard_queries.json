@@ -1,0 +1,74 @@
+[
+  {
+    "id": "Q01",
+    "query": "What are the interest rates for home loans?",
+    "expected_topic": "home_loans",
+    "expected_docs": ["05_home_loans.md"]
+  },
+  {
+    "id": "Q02",
+    "query": "How do I open a savings account online?",
+    "expected_topic": "savings_accounts",
+    "expected_docs": ["02_savings_accounts.md"]
+  },
+  {
+    "id": "Q03",
+    "query": "What are the charges for using other bank ATMs?",
+    "expected_topic": "fees_charges",
+    "expected_docs": ["11_fees_charges.md", "08_debit_cards.md"]
+  },
+  {
+    "id": "Q04",
+    "query": "Tell me about your credit card reward points and benefits",
+    "expected_topic": "credit_cards",
+    "expected_docs": ["07_credit_cards.md"]
+  },
+  {
+    "id": "Q05",
+    "query": "What is the fixed deposit interest rate for senior citizens?",
+    "expected_topic": "fixed_deposits",
+    "expected_docs": ["04_fixed_deposits.md"]
+  },
+  {
+    "id": "Q06",
+    "query": "I lost my debit card. What should I do?",
+    "expected_topic": "debit_cards",
+    "expected_docs": ["08_debit_cards.md", "10_security.md"]
+  },
+  {
+    "id": "Q07",
+    "query": "How can I register for mobile banking?",
+    "expected_topic": "digital_banking",
+    "expected_docs": ["09_digital_banking.md"]
+  },
+  {
+    "id": "Q08",
+    "query": "What documents are required for an education loan?",
+    "expected_topic": "education_loans",
+    "expected_docs": ["12_education_loans.md"]
+  },
+  {
+    "id": "Q09",
+    "query": "How do I report a fraudulent transaction on my account?",
+    "expected_topic": "security",
+    "expected_docs": ["10_security.md", "16_customer_support.md"]
+  },
+  {
+    "id": "Q10",
+    "query": "What types of NRI accounts does the bank offer?",
+    "expected_topic": "nri_services",
+    "expected_docs": ["15_forex_nri.md"]
+  },
+  {
+    "id": "Q11",
+    "query": "Explain the Sukanya Samriddhi Yojana scheme",
+    "expected_topic": "government_schemes",
+    "expected_docs": ["19_government_schemes.md"]
+  },
+  {
+    "id": "Q12",
+    "query": "I want to update my KYC. What is the process?",
+    "expected_topic": "account_management",
+    "expected_docs": ["17_account_management.md"]
+  }
+]

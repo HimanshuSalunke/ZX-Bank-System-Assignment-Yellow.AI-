@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZX Bank AI Assistant</title>
+    <meta name="description"
+        content="ZX Bank's AI-powered banking assistant for account queries, loans, cards, and support.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header" id="header">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-icon">ZX</div>
+                    <div class="logo-text">
+                        <span class="logo-title">ZX Bank</span>
+                        <span class="logo-subtitle">AI Assistant</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="status-badge" id="statusBadge">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Connecting...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Chat Container -->
+        <main class="chat-container" id="chatContainer">
+            <!-- Welcome Message -->
+            <div class="welcome-card" id="welcomeCard">
+                <div class="welcome-icon">🏦</div>
+                <h1 class="welcome-title">Welcome to ZX Bank</h1>
+                <p class="welcome-subtitle">I'm your AI banking assistant. Ask me about accounts, loans, cards, digital
+                    banking, and more.</p>
+                <div class="quick-actions">
+                    <button class="quick-btn"
+                        onclick="sendQuickMessage('What are the interest rates for home loans?')">🏠 Home Loans</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('How do I open a savings account?')">💰 Savings
+                        Account</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('Tell me about your credit cards')">💳 Credit
+                        Cards</button>
+                    <button class="quick-btn"
+                        onclick="sendQuickMessage('What are the FD rates for senior citizens?')">📊 FD Rates</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('How to register for mobile banking?')">📱
+                        Mobile Banking</button>
+                    <button class="quick-btn" onclick="sendQuickMessage('I want to speak to a human agent')">🤝 Talk to
+                        Agent</button>
+                </div>
+            </div>
+
+            <!-- Messages will be appended here -->
+            <div class="messages" id="messages"></div>
+        </main>
+
+        <!-- Input Area -->
+        <footer class="input-area" id="inputArea">
+            <div class="input-wrapper">
+                <textarea id="messageInput" class="message-input"
+                    placeholder="Ask me about ZX Bank products & services..." rows="1" maxlength="2000"
+                    autofocus></textarea>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+            <div class="input-footer">
+                <span class="char-count" id="charCount">0 / 2000</span>
+                <span class="powered-by">Powered by GPT-4.1 via Requesty</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
