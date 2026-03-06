@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     """Application settings loaded from .env + hardcoded defaults."""
 
     # ── Secrets & Deployment (from .env) ───────────────────────────────
-    requesty_api_key: str = ""
+    llm_api_key: str = ""
     llm_model: str = "openai/gpt-4.1-nano"
     llm_base_url: str = "https://router.requesty.ai/v1"
     environment: str = "development"

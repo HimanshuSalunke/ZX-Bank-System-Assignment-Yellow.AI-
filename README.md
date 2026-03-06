@@ -149,7 +149,7 @@ The system is **fully provider-agnostic**. Switching to OpenRouter or any other 
 
 ```env
 LLM_BASE_URL=https://openrouter.ai/api/v1   # or any other provider
-REQUESTY_API_KEY=your_api_key_here
+LLM_API_KEY=your_api_key_here
 ```
 
 No code changes needed.
@@ -245,7 +245,7 @@ cp .env.example .env
 Only **one required setting** in `.env`:
 
 ```env
-REQUESTY_API_KEY=your_key_here          # Required — get from requesty.ai
+LLM_API_KEY=your_key_here              # Required — get from your LLM provider
 LLM_MODEL=openai/gpt-4.1-nano          # Optional (this is the default)
 LLM_BASE_URL=https://router.requesty.ai/v1  # Optional (this is the default)
 ```
