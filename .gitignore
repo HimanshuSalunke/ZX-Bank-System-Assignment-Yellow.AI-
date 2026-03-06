@@ -24,6 +24,9 @@ desktop.ini
 # Logs
 *.log
 
+# PDFs (README.pdf is for submission only, not for repo)
+*.pdf
+
 # Model cache (downloaded automatically on first run)
 # ~/.cache/huggingface/ is used — not in project directory
 
