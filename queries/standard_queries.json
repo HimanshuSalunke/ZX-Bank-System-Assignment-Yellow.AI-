@@ -1,74 +1,142 @@
 [
   {
-    "id": "Q01",
-    "query": "What are the interest rates for home loans?",
-    "expected_topic": "home_loans",
-    "expected_docs": ["05_home_loans.md"]
+    "id": 1,
+    "query": "What are the features of ZX Bank's Savings Account?",
+    "query_type": "Descriptive",
+    "expected_source": "Savings Account Overview.md",
+    "topic": "savings_accounts"
   },
   {
-    "id": "Q02",
-    "query": "How do I open a savings account online?",
-    "expected_topic": "savings_accounts",
-    "expected_docs": ["02_savings_accounts.md"]
+    "id": 2,
+    "query": "How do I apply for a car loan at ZX Bank?",
+    "query_type": "Procedural",
+    "expected_source": "ZX Bank Car Loan.md",
+    "topic": "car_loans"
   },
   {
-    "id": "Q03",
-    "query": "What are the charges for using other bank ATMs?",
-    "expected_topic": "fees_charges",
-    "expected_docs": ["11_fees_charges.md", "08_debit_cards.md"]
+    "id": 3,
+    "query": "What is the interest rate for ZX Bank's Gold Loan?",
+    "query_type": "Descriptive",
+    "expected_source": "ZX Bank Gold Loan.md",
+    "topic": "gold_loans"
   },
   {
-    "id": "Q04",
-    "query": "Tell me about your credit card reward points and benefits",
-    "expected_topic": "credit_cards",
-    "expected_docs": ["07_credit_cards.md"]
+    "id": 4,
+    "query": "Does ZX Bank have ATMs at hospitals in Mumbai?",
+    "query_type": "Boolean",
+    "expected_source": "ATM Locations at Major Hospitals.md",
+    "topic": "atm_locations"
   },
   {
-    "id": "Q05",
-    "query": "What is the fixed deposit interest rate for senior citizens?",
-    "expected_topic": "fixed_deposits",
-    "expected_docs": ["04_fixed_deposits.md"]
+    "id": 5,
+    "query": "How do I report a fraud transaction at ZX Bank?",
+    "query_type": "Procedural",
+    "expected_source": "Fraud Transaction.md",
+    "topic": "fraud_reporting"
   },
   {
-    "id": "Q06",
-    "query": "I lost my debit card. What should I do?",
-    "expected_topic": "debit_cards",
-    "expected_docs": ["08_debit_cards.md", "10_security.md"]
+    "id": 6,
+    "query": "What are the types of credit cards offered by ZX Bank?",
+    "query_type": "Descriptive",
+    "expected_source": "ZX Bank Credit Card.md",
+    "topic": "credit_cards"
   },
   {
-    "id": "Q07",
-    "query": "How can I register for mobile banking?",
-    "expected_topic": "digital_banking",
-    "expected_docs": ["09_digital_banking.md"]
+    "id": 7,
+    "query": "How does the branch network in Mumbai compare to Delhi?",
+    "query_type": "Comparative",
+    "expected_source": "Network in Mumbai.md",
+    "topic": "branch_network"
   },
   {
-    "id": "Q08",
-    "query": "What documents are required for an education loan?",
-    "expected_topic": "education_loans",
-    "expected_docs": ["12_education_loans.md"]
+    "id": 8,
+    "query": "What is UPI and how do I activate it with ZX Bank?",
+    "query_type": "Procedural",
+    "expected_source": "(UPI) – ZX Bank Asia.md",
+    "topic": "upi"
   },
   {
-    "id": "Q09",
-    "query": "How do I report a fraudulent transaction on my account?",
-    "expected_topic": "security",
-    "expected_docs": ["10_security.md", "16_customer_support.md"]
+    "id": 9,
+    "query": "When did ZX Bank receive the Best Digital Transformation Bank award?",
+    "query_type": "Temporal",
+    "expected_source": "Awards & Recognitions.md",
+    "topic": "awards"
   },
   {
-    "id": "Q10",
-    "query": "What types of NRI accounts does the bank offer?",
-    "expected_topic": "nri_services",
-    "expected_docs": ["15_forex_nri.md"]
+    "id": 10,
+    "query": "Why might ZX Bank place ATMs near movie theaters?",
+    "query_type": "Analytical",
+    "expected_source": "ATM Locations at Major Movie Theaters.md",
+    "topic": "atm_strategy"
   },
   {
-    "id": "Q11",
-    "query": "Explain the Sukanya Samriddhi Yojana scheme",
-    "expected_topic": "government_schemes",
-    "expected_docs": ["19_government_schemes.md"]
+    "id": 11,
+    "query": "What are the features of ZX Bank's Agriculture Loan?",
+    "query_type": "Descriptive",
+    "expected_source": "ZX Bank Agriculture Loan.md",
+    "topic": "agriculture_loans"
   },
   {
-    "id": "Q12",
-    "query": "I want to update my KYC. What is the process?",
-    "expected_topic": "account_management",
-    "expected_docs": ["17_account_management.md"]
+    "id": 12,
+    "query": "Is the ZX Bank Bike Loan available for electric bikes?",
+    "query_type": "Boolean",
+    "expected_source": "ZX Bank Bike Loan.md",
+    "topic": "bike_loans"
+  },
+  {
+    "id": 13,
+    "query": "What safety features does ZX Bank have against online threats?",
+    "query_type": "Descriptive",
+    "expected_source": "Safety Features.md",
+    "topic": "security"
+  },
+  {
+    "id": 14,
+    "query": "How do I convert my salary account to a savings account?",
+    "query_type": "Procedural",
+    "expected_source": "Salary Account to a Savings Account.md",
+    "topic": "account_conversion"
+  },
+  {
+    "id": 15,
+    "query": "What types of business loans does ZX Bank offer?",
+    "query_type": "Open-Ended",
+    "expected_source": "ZX Bank – Business Loans.md",
+    "topic": "business_loans"
+  },
+  {
+    "id": 16,
+    "query": "Does ZX Bank offer cross-border payment services?",
+    "query_type": "Boolean",
+    "expected_source": "Cross-Border Payments.md",
+    "topic": "cross_border"
+  },
+  {
+    "id": 17,
+    "query": "How do I open a locker at ZX Bank?",
+    "query_type": "Procedural",
+    "expected_source": "Open a Locker.md",
+    "topic": "locker"
+  },
+  {
+    "id": 18,
+    "query": "What is the Personal Relationship Manager Assistant program?",
+    "query_type": "Descriptive",
+    "expected_source": "Personal Relationship Manager Assistant Program.md",
+    "topic": "prm"
+  },
+  {
+    "id": 19,
+    "query": "What is the maximum house loan amount at ZX Bank?",
+    "query_type": "Descriptive",
+    "expected_source": "ZX Bank House Loan.md",
+    "topic": "house_loans"
+  },
+  {
+    "id": 20,
+    "query": "What can I do with ASK Zia, the ZX Bank chatbot?",
+    "query_type": "Open-Ended",
+    "expected_source": "ASK Zia – Your 24_7 Banking Assistant.md",
+    "topic": "chatbot"
   }
 ]

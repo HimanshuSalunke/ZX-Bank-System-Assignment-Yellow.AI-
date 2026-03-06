@@ -35,11 +35,24 @@ class Settings(BaseSettings):
     llm_temperature: float = 0.3
     llm_max_tokens: int = 512
     embedding_model: str = "all-MiniLM-L6-v2"
-    embedding_device: str = "cuda"
+    embedding_device: str = ""  # Auto-detected: "cuda" if GPU available, else "cpu"
     retrieval_top_k: int = 5
-    confidence_threshold: float = 0.45
+    confidence_threshold: float = 0.40
     rrf_k: int = 60
     log_level: str = "INFO"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Auto-detect GPU/CPU if not explicitly set
+        if not self.embedding_device:
+            try:
+                import torch
+                if torch.cuda.is_available():
+                    object.__setattr__(self, "embedding_device", "cuda")
+                else:
+                    object.__setattr__(self, "embedding_device", "cpu")
+            except ImportError:
+                object.__setattr__(self, "embedding_device", "cpu")
 
     # ── Derived Paths ──────────────────────────────────────────────────
     @property

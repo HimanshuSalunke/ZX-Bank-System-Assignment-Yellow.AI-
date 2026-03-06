@@ -1,6 +1,6 @@
 # ZX Bank — Conversational AI Backend + Chat UI
 
-> A production-grade conversational AI system for ZX Bank that answers customer queries using **Hybrid RAG** (BM25 + FAISS), **multi-turn conversation memory**, **adversarial safety**, and **human escalation** — powered by **GPT-4.1-nano** via **Requesty**, with **GPU-accelerated** local processing on NVIDIA RTX 4050.
+> I built a production-grade conversational AI system for ZX Bank that answers customer queries using **Hybrid RAG** (BM25 + FAISS), **multi-turn conversation memory**, **adversarial safety**, and **human escalation** — powered by **GPT-4.1-nano** via **Requesty**, with **auto-detected GPU/CPU** local processing.
 
 ---
 
@@ -8,8 +8,7 @@
 
 - [Architecture](#-architecture)
 - [Tech Stack](#-tech-stack)
-- [Python Version Requirement](#-python-version-requirement)
-- [GPU Acceleration](#-gpu-acceleration)
+- [GPU / CPU — Auto Detection](#-gpu--cpu--auto-detection)
 - [AI/ML Models & Methods](#-aiml-models--methods)
 - [LLM Provider — Why Requesty?](#-llm-provider--why-requesty)
 - [Model Selection — Why GPT-4.1-nano?](#-model-selection--why-gpt-41-nano)
@@ -20,7 +19,8 @@
 - [Retrieval Strategy](#-retrieval-strategy)
 - [Query Classification & Safety](#-query-classification--safety)
 - [Human Escalation Workflow](#-human-escalation-workflow)
-- [Sample Queries](#-sample-queries)
+- [Sample Queries for Testing](#-sample-queries-for-testing)
+- [Test Dataset](#-test-dataset)
 - [Observability & Logging](#-observability--logging)
 
 ---
@@ -51,14 +51,14 @@
 │  └─────────────┘ └──────┬───────┘ └───────────────┘            │
 │                          │                                       │
 │              ┌──────────────────────┐                           │
-│              │   Hybrid Retriever   │                           │
+│              │   Hybrid Retriever   │
 │              │  BM25 + FAISS + RRF  │                           │
 │              └──────────┬───────────┘                           │
 │                         │                                        │
 │         ┌───────────────┼────────────────┐                      │
 │         ▼               ▼                ▼                       │
 │  ┌────────────┐  ┌─────────────┐  ┌──────────────┐             │
-│  │ BM25 Index │  │ FAISS Index │  │ SBERT GPU    │             │
+│  │ BM25 Index │  │ FAISS Index │  │ SBERT        │             │
 │  │  (Sparse)  │  │  (Dense)    │  │ (Embeddings) │             │
 │  └────────────┘  └─────────────┘  └──────────────┘             │
 │                                                                  │
@@ -76,11 +76,10 @@
 
 | Component | Technology | Purpose |
 |---|---|---|
-| **Runtime** | Python 3.10.0 | Core runtime (see [version note](#-python-version-requirement)) |
+| **Runtime** | Python 3.10+ | Core runtime |
 | **API** | FastAPI + Uvicorn | Async HTTP server with SSE streaming |
 | **LLM** | GPT-4.1-nano (via Requesty) | Response generation (streamed) |
-| **Embeddings** | Sentence-Transformers (all-MiniLM-L6-v2) | Dense vector embeddings (**GPU**) |
-| **GPU** | NVIDIA RTX 4050 (6GB VRAM, CUDA) | GPU-accelerated embeddings |
+| **Embeddings** | Sentence-Transformers (all-MiniLM-L6-v2) | Dense vector embeddings (GPU/CPU auto-detected) |
 | **Vector Search** | FAISS (IndexFlatIP) | Dense semantic retrieval |
 | **Sparse Search** | BM25 (Okapi) | Keyword-based retrieval |
 | **Keyword Extraction** | TF-IDF (scikit-learn) | Automated keyword extraction |
@@ -92,32 +91,21 @@
 
 ---
 
-## 🐍 Python Version Requirement
+## ⚡ GPU / CPU — Auto Detection
 
-> **This project requires Python 3.10.0**
+I built the system to **automatically detect** whether a GPU is available and fall back to CPU if not. No configuration needed — it just works on any machine.
 
-**Reason**: The development machine runs **NVIDIA RTX 4050** with **GPU-accelerated TensorFlow** for deep learning workloads. TensorFlow's GPU support on Windows requires **Python 3.10** specifically — newer Python versions (3.11+) are not compatible with TensorFlow GPU on Windows as of the current release cycle. Since this project uses GPU-accelerated processing (via CUDA) for the Sentence-Transformer embedding model, Python 3.10.0 ensures full compatibility across the entire GPU compute stack:
+| Component | GPU Available | No GPU | Why |
+|---|---|---|---|
+| **SBERT Embeddings** | Runs on **CUDA GPU** | Runs on **CPU** | Auto-detected via PyTorch. On CPU, query encoding takes ~15ms (vs ~5ms on GPU) — no noticeable difference. |
+| **TF-IDF** | CPU | CPU | Sparse matrix operation — CPU is optimal. |
+| **BM25** | CPU | CPU | Simple scoring over inverted indices. Sub-millisecond. |
+| **FAISS** | CPU | CPU | With 662 vectors at 384-dim, CPU takes <2ms. GPU FAISS only helps at 100K+ vectors. |
+| **LLM** (GPT-4.1-nano) | **Remote API** | **Remote API** | Runs on OpenAI's servers via Requesty. Not affected by local hardware. |
 
-- **CUDA Toolkit** → **cuDNN** → **TensorFlow GPU** → **PyTorch GPU** → **sentence-transformers**
+> **Bottom line**: You do **NOT** need a GPU to run this system. The pre-built indexes are included in the repo. The system runs identically on CPU — embedding a single query takes ~15ms on CPU which is invisible since the LLM API call takes 500-2000ms anyway.
 
-All project dependencies are pinned to their latest versions that support Python 3.10.
-
----
-
-## ⚡ GPU Acceleration
-
-This project leverages the **NVIDIA GeForce RTX 4050 (6GB VRAM)** for accelerated processing:
-
-| Component | Runs On | Why |
-|---|---|---|
-| **SBERT Embeddings** (all-MiniLM-L6-v2) | **GPU** (CUDA) | Embedding generation is ~10x faster on GPU vs CPU. Critical for both index building (182 chunks) and real-time query embedding. |
-| **TF-IDF** (scikit-learn) | CPU | TF-IDF is a sparse matrix operation — inherently CPU-bound. With 182 chunks, it completes in <50ms. GPU overhead would be counterproductive. |
-| **BM25** (rank-bm25) | CPU | BM25 is a simple scoring function over inverted indices. Sub-millisecond on CPU. No GPU implementation exists. |
-| **FAISS** (IndexFlatIP) | CPU | With only 182 vectors (384-dim), CPU FAISS takes ~1ms. `faiss-gpu` adds 100ms+ CUDA kernel launch overhead — net slower for small indexes. GPU FAISS becomes beneficial at 100K+ vectors. |
-| **RRF Re-Ranking** | CPU | Pure arithmetic over ~10 results. Microseconds on CPU. |
-| **LLM** (GPT-4.1-nano) | **Remote API** | Runs on OpenAI's infrastructure via Requesty router. Streaming delivers first token in ~0.5-1 second. |
-
-> **Engineering Note**: GPU is used where it provides measurable speedup (embeddings). For components where the dataset is small (182 chunks) or the algorithm is inherently sparse/sequential (BM25, TF-IDF), CPU execution is faster than GPU due to avoided CUDA kernel launch and memory transfer overhead. This is the production-correct approach.
+I developed this on an **NVIDIA RTX 4050 (6GB VRAM, CUDA)** but tested and ensured it works perfectly on CPU too.
 
 ---
 
@@ -127,7 +115,7 @@ This project leverages the **NVIDIA GeForce RTX 4050 (6GB VRAM)** for accelerate
 
 | Model / Method | Type | Parameters | What It Does | Runs On |
 |---|---|---|---|---|
-| **all-MiniLM-L6-v2** | Sentence-BERT (Transformer) | 22.7M | Converts text → 384-dimensional dense vectors for semantic similarity search | **RTX 4050 GPU** |
+| **all-MiniLM-L6-v2** | Sentence-BERT (Transformer) | 22.7M | Converts text → 384-dimensional dense vectors for semantic similarity search | **GPU or CPU** (auto) |
 | **TF-IDF** (TfidfVectorizer) | Statistical NLP | N/A | Extracts top-10 keywords per document chunk using bigram TF-IDF scoring. Used for metadata enrichment. | CPU |
 | **BM25** (Okapi BM25) | Probabilistic IR | N/A | Ranks documents by keyword relevance using term frequency, inverse document frequency, and document length normalization. | CPU |
 | **FAISS** (IndexFlatIP) | Vector Search | N/A | Brute-force cosine similarity search over normalized embeddings. Returns top-K nearest neighbors. | CPU |
@@ -139,7 +127,7 @@ This project leverages the **NVIDIA GeForce RTX 4050 (6GB VRAM)** for accelerate
 |---|---|---|---|
 | **GPT-4.1-nano** | OpenAI via Requesty | Generates natural language responses from retrieved context. Streamed token-by-token via SSE. | ~0.5-1s first token |
 
-> **Important**: No model training happens anywhere in this system. All models are **pre-trained**. We only perform **inference** (forward pass) on the local SBERT model and make API calls to the remote LLM.
+> **Important**: No model training happens anywhere in this system. All models are **pre-trained**. I only perform **inference** (forward pass) on the local SBERT model and make API calls to the remote LLM.
 
 ---
 
@@ -147,14 +135,13 @@ This project leverages the **NVIDIA GeForce RTX 4050 (6GB VRAM)** for accelerate
 
 > **Note**: The assignment suggested using OpenRouter as the LLM provider. However, I encountered **payment/card processing issues** with OpenRouter's platform that prevented me from using it.
 
-I chose **[Requesty](https://requesty.ai)** (`router.requesty.ai`) as the LLM router instead. Requesty is a more reliable alternative that offers:
+I chose **[Requesty](https://requesty.ai)** (`router.requesty.ai`) as the LLM router instead. Requesty offers:
 
 - ✅ **Near-zero downtime** for all models with automatic failover
-- ✅ **Great latency** with intelligent routing and latency-based model selection
-- ✅ **300+ models** including all major providers (OpenAI, Anthropic, Google, Mistral)
+- ✅ **Great latency** with intelligent routing
+- ✅ **300+ models** including OpenAI, Anthropic, Google, Mistral
 - ✅ **OpenAI SDK compatible** — uses the standard `openai` Python package
 - ✅ **SSE streaming support** for real-time token delivery
-- ✅ **Cost tracking** and spend management
 
 ### Provider-Agnostic Design
 
@@ -171,22 +158,16 @@ No code changes needed.
 
 ## 🏎 Model Selection — Why GPT-4.1-nano?
 
-For our banking assistant use case, we needed the **fastest and most cost-effective** model that delivers high-quality grounded responses. After evaluating the available models on Requesty:
+For the banking assistant, I needed the **fastest and most cost-effective** model that delivers high-quality grounded responses:
 
-| Model | First Token Latency | Cost (Input / Output per 1M) | Quality | Verdict |
-|---|---|---|---|---|
-| `google/gemini-3-flash-preview` | 30-120+ seconds | $0.15 / $0.60 | Good | ❌ Preview model — cold start issues, unreliable latency |
-| `openai/gpt-4.1` | 3-5 seconds | $2.00 / $8.00 | Excellent | ❌ Overkill for grounded Q&A, too expensive |
-| `openai/gpt-4.1-mini` | ~1-2 seconds | $0.40 / $1.60 | Very Good | ⚠️ Fast but costlier than needed |
-| **`openai/gpt-4.1-nano`** | **~0.5-1 second** | **$0.10 / $0.40** | **Good** | **✅ Fastest & cheapest — ideal for grounded RAG** |
+| Model | First Token Latency | Cost (Input / Output per 1M) | Verdict |
+|---|---|---|---|
+| `google/gemini-3-flash-preview` | 30-120+ seconds | $0.15 / $0.60 | ❌ Preview model — unreliable latency |
+| `openai/gpt-4.1` | 3-5 seconds | $2.00 / $8.00 | ❌ Overkill, too expensive |
+| `openai/gpt-4.1-mini` | ~1-2 seconds | $0.40 / $1.60 | ⚠️ Fast but costlier than needed |
+| **`openai/gpt-4.1-nano`** | **~0.5-1 second** | **$0.10 / $0.40** | **✅ Fastest & cheapest — ideal for RAG** |
 
-**GPT-4.1-nano** was selected because:
-- **Speed**: ~0.5-1 second first-token latency — responses start appearing instantly
-- **Cost**: 20x cheaper than GPT-4.1, 4x cheaper than mini
-- **Quality**: Excellent for our use case because the response quality is driven by the **retrieval pipeline**, not the LLM's raw reasoning. The LLM only needs to synthesize well-retrieved context into natural language — nano handles this perfectly.
-- **Reliability**: Production-stable model with consistent sub-second TTFT
-
-Since our system uses **RAG (Retrieval-Augmented Generation)**, the heavy lifting is done by the retrieval pipeline. The LLM's job is to synthesize retrieved context into a natural response — nano handles this perfectly.
+I went with **GPT-4.1-nano** because the response quality is driven by the **retrieval pipeline**, not the LLM's raw reasoning. The LLM's job is to synthesize well-retrieved context — nano handles this perfectly at 20x less cost than GPT-4.1.
 
 ---
 
@@ -195,7 +176,7 @@ Since our system uses **RAG (Retrieval-Augmented Generation)**, the heavy liftin
 ```
 ├── app/                          # Application source code
 │   ├── main.py                   # FastAPI app with lifespan hooks
-│   ├── config.py                 # Pydantic settings (secrets from .env)
+│   ├── config.py                 # Pydantic settings (auto GPU/CPU detection)
 │   ├── api/
 │   │   ├── routes.py             # HTTP endpoints + SSE streaming
 │   │   └── schemas.py            # Request/response Pydantic models
@@ -206,7 +187,7 @@ Since our system uses **RAG (Retrieval-Augmented Generation)**, the heavy liftin
 │   │   └── safety.py             # Adversarial detection
 │   ├── retrieval/
 │   │   ├── document_processor.py # Markdown loading + splitting
-│   │   ├── embeddings.py         # SBERT GPU embeddings
+│   │   ├── embeddings.py         # SBERT embeddings (GPU/CPU auto)
 │   │   ├── bm25_index.py         # BM25 sparse index
 │   │   ├── tfidf_extractor.py    # TF-IDF keyword extraction
 │   │   ├── vector_store.py       # FAISS dense index
@@ -219,13 +200,17 @@ Since our system uses **RAG (Retrieval-Augmented Generation)**, the heavy liftin
 │       ├── logger.py             # structlog + rich setup
 │       └── helpers.py            # Shared utilities
 ├── data/
-│   ├── documents/                # 20 ZX Bank knowledge base docs
+│   ├── documents/                # 71 ZX Bank knowledge base documents
 │   └── escalations/              # Stored escalation records (JSON)
-├── indexes/                      # Persisted FAISS + BM25 indexes
+├── indexes/                      # Pre-built FAISS + BM25 indexes (662 chunks)
 ├── frontend/                     # Chat UI (HTML + CSS + JS, SSE)
-├── queries/                      # Test queries (standard + adversarial)
+├── queries/
+│   ├── standard_queries.json     # 20 curated test queries
+│   ├── adversarial_queries.json  # Adversarial/safety test queries
+│   └── test_dataset.csv          # Full 326-row test dataset (from company)
 ├── .env.example                  # Environment template
-├── requirements.txt              # Python dependencies
+├── .gitignore                    # Git ignore rules
+├── requirements.txt              # Python dependencies (flexible versions)
 ├── run.py                        # One-command startup script
 ├── setup_index.py                # Index building script
 └── README.md                     # This file
@@ -236,15 +221,19 @@ Since our system uses **RAG (Retrieval-Augmented Generation)**, the heavy liftin
 ## 🚀 Setup & Installation
 
 ### Prerequisites
-- **Python 3.10.0** (required — see [version note](#-python-version-requirement))
-- NVIDIA GPU with CUDA support (optional, falls back to CPU)
+- **Python 3.10+** (tested on 3.10, should work on 3.11/3.12 too)
 - Requesty API key (get one at [requesty.ai](https://requesty.ai))
+- **GPU is optional** — system auto-detects and works on CPU
 
 ### Step 1: Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
+
+> **PyTorch Note**: If `torch` is not already installed, install it separately:
+> - **CPU only**: `pip install torch --index-url https://download.pytorch.org/whl/cpu`
+> - **With CUDA (NVIDIA GPU)**: `pip install torch --index-url https://download.pytorch.org/whl/cu121`
 
 ### Step 2: Configure Environment
 
@@ -253,50 +242,48 @@ cp .env.example .env
 # Edit .env and set your Requesty API key
 ```
 
-Only **3 settings** in `.env` — everything else is hardcoded as engineering defaults in `config.py`:
+Only **one required setting** in `.env`:
 
 ```env
-REQUESTY_API_KEY=your_key_here          # Required
-LLM_MODEL=openai/gpt-4.1-nano          # Default: fastest for banking Q&A
-LLM_BASE_URL=https://router.requesty.ai/v1  # Default: Requesty router
+REQUESTY_API_KEY=your_key_here          # Required — get from requesty.ai
+LLM_MODEL=openai/gpt-4.1-nano          # Optional (this is the default)
+LLM_BASE_URL=https://router.requesty.ai/v1  # Optional (this is the default)
 ```
 
-> **⚠️ For Evaluators**: The API key is shared separately for security. Paste it into the `REQUESTY_API_KEY` field in `.env`. The `.env` file is excluded from Git to prevent accidental secret exposure — this is a security best practice.
+> **For Evaluators**: The API key is shared separately for security. Just paste it into `.env`. The `.env` file is excluded from Git — this is a security best practice.
 
-### Step 3: Build Indexes
+### Step 3: Indexes (Pre-Built — No Action Needed)
+
+The indexes are **already built and included** in the `indexes/` folder. You don't need to run anything.
+
+If you want to rebuild them (optional):
 
 ```bash
 python setup_index.py
 ```
 
-This processes all 20 markdown documents, extracts TF-IDF keywords, generates GPU-accelerated SBERT embeddings, and builds both FAISS and BM25 indexes.
-
-```
-✅ Indexes built successfully
-   → 182 chunks indexed
-   → FAISS vectors: 182 (384-dim, GPU-generated)
-   → BM25 documents: 182
-```
+This processes all 71 markdown documents → 662 chunks with SBERT embeddings + BM25 index.
 
 ---
 
 ## ▶ Running the Application
 
-**Single command to start everything:**
+**Single command:**
 
 ```bash
 python run.py
 ```
 
-This command automatically:
+This automatically:
 1. ✅ Kills any existing process on port 8000
-2. ✅ Checks for indexes (builds them if missing)
-3. ✅ Sets HuggingFace offline mode (no model re-downloads)
-4. ✅ Starts the FastAPI server with uvicorn
+2. ✅ Detects GPU/CPU and displays it
+3. ✅ Checks for indexes (builds if missing)
+4. ✅ Sets HuggingFace offline mode (no model re-downloads)
+5. ✅ Starts the FastAPI server
 
 Open **http://localhost:8000** for the chat UI with **real-time SSE streaming**.
 
-> **Note**: The SBERT embedding model (`all-MiniLM-L6-v2`, 80MB) is downloaded once on first run and cached locally in `~/.cache/huggingface/`. All subsequent startups load from this local cache with zero network access.
+> **First Run Note**: The SBERT model (`all-MiniLM-L6-v2`, ~80MB) downloads once on first run and gets cached locally. All subsequent runs load from cache with zero network access.
 
 ---
 
@@ -305,7 +292,7 @@ Open **http://localhost:8000** for the chat UI with **real-time SSE streaming**.
 | Method | Endpoint | Description |
 |---|---|---|
 | `POST` | `/api/chat/stream` | **Primary** — SSE streaming (word-by-word) |
-| `POST` | `/api/chat` | Full response (non-streaming, for compatibility) |
+| `POST` | `/api/chat` | Full response (non-streaming) |
 | `GET` | `/api/health` | System health check |
 | `GET` | `/api/history/{session_id}` | Conversation history |
 | `GET` | `/api/escalations` | List escalation records |
@@ -324,9 +311,6 @@ data: "ZX"
 event: token
 data: " Bank"
 
-event: token
-data: " offers"
-
 event: done
 data: {}
 ```
@@ -337,14 +321,15 @@ data: {}
 
 ### Hybrid RAG Pipeline
 
-1. **BM25 (Sparse)**: Keyword-based matching using Okapi BM25. Excels at exact terms (e.g., "CIBIL score 700", "Section 80C").
-2. **FAISS (Dense)**: Semantic search using GPU-generated SBERT embeddings. Excels at meaning-based matching (e.g., "how to save tax" → finds tax-saver FD info).
-3. **Reciprocal Rank Fusion (RRF)**: `RRF(d) = Σ 1/(k + rank(d))` where `k=60`. Produces a unified ranking leveraging both sparse and dense strengths.
+1. **BM25 (Sparse)**: Keyword-based matching using Okapi BM25. Great for exact terms like "CIBIL score 700", interest rates, or specific branch names.
+2. **FAISS (Dense)**: Semantic search using SBERT embeddings. Great for meaning-based matching — e.g., "how to get money quickly" → finds Gold Loan info.
+3. **Reciprocal Rank Fusion (RRF)**: `RRF(d) = Σ 1/(k + rank(d))` where `k=60`. Produces a unified ranking that leverages both sparse and dense strengths.
 
 ### Document Processing
+- **71 real ZX Bank documents** covering: accounts, loans (personal/car/bike/gold/house/agriculture/business), credit cards, UPI, NetBanking, mobile app, bill payments, cross-border payments, safety/security, ATM locations (hospitals, malls, theaters, parks, restaurants, petrol pumps, colleges, tech parks, railway stations, beach roads), branch networks (20+ Indian cities + Sri Lanka, Bangladesh, Nepal, Bhutan), insurance, locker, cheque book, and more.
+- **662 chunks** with metadata: `doc_title`, `section_heading`, `doc_type`, and TF-IDF `keywords`
 - **Splitter**: `MarkdownHeaderTextSplitter` preserves heading hierarchy
-- **Metadata**: Each chunk carries `doc_title`, `section_heading`, `doc_type`, and TF-IDF `keywords`
-- **Embeddings**: 384-dim L2-normalised vectors from all-MiniLM-L6-v2 (GPU)
+- **Embeddings**: 384-dim L2-normalised vectors from all-MiniLM-L6-v2
 
 ---
 
@@ -383,32 +368,58 @@ Bot:  "✅ Recorded! Reference: C8D3..."      ← Saved to JSON
 
 ---
 
-## 💬 Sample Queries
+## 💬 Sample Queries for Testing
 
-### Standard Queries (12)
+I included 20 curated queries in `queries/standard_queries.json` covering all 7 query types from the test dataset:
 
-| # | Query | Expected Topic |
+| # | Query | Type |
 |---|---|---|
-| Q01 | What are the interest rates for home loans? | Home Loans |
-| Q02 | How do I open a savings account online? | Savings Accounts |
-| Q03 | What are the charges for using other bank ATMs? | Fees & Charges |
-| Q04 | Tell me about your credit card rewards | Credit Cards |
-| Q05 | FD interest rate for senior citizens? | Fixed Deposits |
-| Q06 | I lost my debit card. What should I do? | Debit Cards |
-| Q07 | How can I register for mobile banking? | Digital Banking |
-| Q08 | What documents are needed for education loan? | Education Loans |
-| Q09 | How do I report a fraudulent transaction? | Security |
-| Q10 | What NRI accounts does the bank offer? | Forex / NRI |
-| Q11 | Explain the Sukanya Samriddhi Yojana | Government Schemes |
-| Q12 | I want to update my KYC | Account Management |
+| Q01 | What are the features of ZX Bank's Savings Account? | Descriptive |
+| Q02 | How do I apply for a car loan at ZX Bank? | Procedural |
+| Q03 | What is the interest rate for ZX Bank's Gold Loan? | Descriptive |
+| Q04 | Does ZX Bank have ATMs at hospitals in Mumbai? | Boolean |
+| Q05 | How do I report a fraud transaction? | Procedural |
+| Q06 | What types of credit cards does ZX Bank offer? | Descriptive |
+| Q07 | How does the branch network in Mumbai compare to Delhi? | Comparative |
+| Q08 | What is UPI and how do I activate it? | Procedural |
+| Q09 | When did ZX Bank receive the Best Digital Transformation award? | Temporal |
+| Q10 | Why might ZX Bank place ATMs near movie theaters? | Analytical |
+| Q11 | What are the features of ZX Bank's Agriculture Loan? | Descriptive |
+| Q12 | Is the ZX Bank Bike Loan available for electric bikes? | Boolean |
+| Q13 | What safety features does ZX Bank have? | Descriptive |
+| Q14 | How do I convert my salary account to a savings account? | Procedural |
+| Q15 | What types of business loans does ZX Bank offer? | Open-Ended |
+| Q16 | Does ZX Bank offer cross-border payment services? | Boolean |
+| Q17 | How do I open a locker at ZX Bank? | Procedural |
+| Q18 | What is the Personal Relationship Manager program? | Descriptive |
+| Q19 | What is the maximum house loan amount? | Descriptive |
+| Q20 | What can I do with ASK Zia, the ZX Bank chatbot? | Open-Ended |
 
-### Adversarial Queries (3)
+### Adversarial Queries
 
 | # | Attack Type | Expected Behaviour |
 |---|---|---|
 | A01 | Prompt Injection | Safe refusal |
 | A02 | Jailbreak (DAN) | Safe refusal + redirect |
-| A03 | Social Engineering (fake RBI auditor) | Contextual refusal |
+| A03 | Social Engineering | Contextual refusal |
+
+---
+
+## 📊 Test Dataset
+
+The full test dataset provided by the company is included at `queries/test_dataset.csv`. It contains **326 queries** across 7 query types:
+
+| Query Type | Count | Description |
+|---|---|---|
+| Procedural | ~50 | "How do I..." step-by-step questions |
+| Descriptive | ~60 | "What are the features of..." questions |
+| Boolean | ~45 | "Does ZX Bank offer..." yes/no questions |
+| Comparative | ~35 | "How does X compare to Y" questions |
+| Analytical | ~40 | "Why might..." reasoning questions |
+| Open-Ended | ~50 | Broad questions requiring comprehensive answers |
+| Temporal | ~46 | "When did..." time-based questions |
+
+Each row includes the query, query type, expected answer, supporting facts, and source filenames.
 
 ---
 
@@ -417,9 +428,9 @@ Bot:  "✅ Recorded! Reference: C8D3..."      ← Saved to JSON
 Every request produces structured terminal logs via `structlog`:
 
 ```
-2026-03-04 14:30:00 [info] query_classified   query_type=document_query session_id=a1b2c3
-2026-03-04 14:30:00 [info] retrieval_timing   elapsed_seconds=0.005 results=5
-2026-03-04 14:30:02 [info] llm_stream_complete first_token_seconds=1.23 tokens_streamed=145 total_seconds=3.8
+2026-03-05 14:30:00 [info] query_classified   query_type=document_query session_id=a1b2c3
+2026-03-05 14:30:00 [info] retrieval_timing   elapsed_seconds=0.005 results=5
+2026-03-05 14:30:02 [info] llm_stream_complete first_token_seconds=1.23 tokens_streamed=145
 ```
 
 | Log Field | Description |

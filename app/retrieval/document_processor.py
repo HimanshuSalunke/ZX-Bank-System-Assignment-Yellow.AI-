@@ -83,34 +83,79 @@ def _extract_doc_title(content: str, filename: str) -> str:
 def _classify_doc_type(filename: str) -> str:
     """Classify document type from filename for metadata enrichment."""
     mapping = {
+        # Company information
         "about": "company_info",
+        "award": "company_info",
+        "recognition": "company_info",
+        # Account types
         "savings": "account",
         "current": "account",
+        "salary": "account",
+        # Deposits
+        "fixed deposit": "deposit",
         "fixed_deposit": "deposit",
+        # Loans
+        "home loan": "loan",
         "home_loan": "loan",
+        "house loan": "loan",
+        "personal loan": "loan",
         "personal_loan": "loan",
+        "education loan": "loan",
         "education_loan": "loan",
-        "business": "loan",
-        "vehicle": "loan",
+        "car loan": "loan",
+        "bike loan": "loan",
+        "gold loan": "loan",
+        "agriculture": "loan",
+        "business loan": "loan",
+        "business loans": "loan",
+        # Cards
+        "credit card": "card",
         "credit_card": "card",
+        "debit card": "card",
         "debit_card": "card",
-        "digital": "digital_banking",
-        "mobile": "digital_banking",
+        "cheque": "services",
+        # Digital banking
+        "upi": "digital_banking",
+        "netbanking": "digital_banking",
+        "net banking": "digital_banking",
+        "mobile app": "digital_banking",
+        "bill payment": "digital_banking",
+        "cross-border": "digital_banking",
+        # Security
+        "safety": "security",
         "security": "security",
         "fraud": "security",
-        "fees": "charges",
-        "charges": "charges",
+        "protect": "security",
+        # Insurance
+        "health insurance": "insurance",
+        "insurance": "insurance",
+        # Services
+        "locker": "services",
+        "zia": "services",
+        "prm": "services",
+        "relationship manager": "services",
+        # Infrastructure — ATM locations
+        "atm": "infrastructure",
+        # Infrastructure — Branch networks
+        "branch": "infrastructure",
+        "network in": "infrastructure",
+        "branches in": "infrastructure",
+        # Account management
+        "close": "procedures",
+        "convert": "procedures",
+        "account to a": "procedures",
+        # Financial products
         "wealth": "investment",
         "forex": "forex",
         "nri": "nri",
+        # Support
         "customer": "support",
         "support": "support",
         "grievance": "support",
-        "atm": "infrastructure",
-        "branch": "infrastructure",
-        "government": "government_scheme",
-        "scheme": "government_scheme",
-        "account_management": "procedures",
+        # Charges
+        "fees": "charges",
+        "charges": "charges",
+        # Regulatory
         "terms": "regulatory",
         "policy": "regulatory",
     }

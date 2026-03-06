@@ -1,18 +1,18 @@
 # =============================================================================
 # ZX Bank Conversational AI — Python Dependencies
-# Python 3.10.0 | Windows | NVIDIA RTX 4050 (CUDA)
+# Python 3.10+ | Works on Windows/macOS/Linux | GPU optional (auto-detected)
 # =============================================================================
 
 # --- API Framework -----------------------------------------------------------
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
 
 # --- LLM Client (OpenAI-compatible SDK for Requesty) ------------------------
 openai>=1.50.0
 
 # --- NLP & Embeddings --------------------------------------------------------
-sentence-transformers==5.2.2
-scikit-learn==1.7.2
+sentence-transformers>=3.0.0
+scikit-learn>=1.3.0
 
 # --- Vector Search & Sparse Retrieval ----------------------------------------
 faiss-cpu>=1.7.4
@@ -22,7 +22,7 @@ rank-bm25>=0.2.2
 langchain-text-splitters>=0.2.0
 
 # --- Data Validation & Configuration -----------------------------------------
-pydantic>=2.12.0
+pydantic>=2.5.0
 pydantic-settings>=2.0.0
 python-dotenv>=1.0.0
 
@@ -33,8 +33,8 @@ rich>=13.0.0
 # --- HTTP Client -------------------------------------------------------------
 httpx>=0.26.0
 
-# --- Existing System Packages (DO NOT REINSTALL) ----------------------------
-# numpy==1.24.4          (pre-installed)
-# torch==2.10.0+cu130    (pre-installed)
-# tensorflow==2.10.1     (pre-installed)
-# protobuf==3.20.0       (pre-installed)
+# --- PyTorch (REQUIRED — install separately if not present) ------------------
+# CPU: pip install torch --index-url https://download.pytorch.org/whl/cpu
+# CUDA: pip install torch --index-url https://download.pytorch.org/whl/cu121
+# The system auto-detects GPU/CPU — no configuration needed.
+# If torch is already installed (any version >= 2.0), it will work.

@@ -75,8 +75,8 @@ def check_indexes():
         return True
 
     print("[*] Indexes not found — building now...")
-    print("    (This only happens once. It processes 20 documents into")
-    print("    FAISS + BM25 indexes using GPU-accelerated embeddings.)")
+    print("    (This only happens once. It processes all documents into")
+    print("    FAISS + BM25 indexes using SBERT embeddings.)")
     # Index build needs online mode for first-time model download
     env = os.environ.copy()
     env["HF_HUB_OFFLINE"] = "0"
@@ -95,10 +95,18 @@ def check_indexes():
 
 def main():
     """Main entry point — kill old processes, check indexes, start server."""
+    # Detect GPU/CPU for display
+    try:
+        import torch
+        device = "CUDA (GPU)" if torch.cuda.is_available() else "CPU"
+    except ImportError:
+        device = "CPU"
+
     print("=" * 60)
     print("  ZX Bank AI — Starting System")
     print("=" * 60)
-    print(f"  Model: {os.environ.get('LLM_MODEL', 'openai/gpt-4.1-nano')}")
+    print(f"  LLM Model : {os.environ.get('LLM_MODEL', 'openai/gpt-4.1-nano')}")
+    print(f"  Embeddings: {device}")
     print(f"  HF Offline: {os.environ.get('HF_HUB_OFFLINE', 'not set')}")
     print("=" * 60)
 

@@ -1,49 +1,36 @@
-# =============================================================================
-# ZX Bank AI — Git Ignore
-# =============================================================================
-
-# --- Environment & Secrets ---------------------------------------------------
-.env
-*.env.local
-
-# --- Python -------------------------------------------------------------------
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-*.egg-info/
-dist/
-build/
-*.egg
 
-# --- Virtual Environment -----------------------------------------------------
+# Virtual Environment
 venv/
 .venv/
 env/
+.env
 
-# --- IDE ----------------------------------------------------------------------
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
-# --- OS -----------------------------------------------------------------------
+# OS
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# --- Indexes (regenerated on build) ------------------------------------------
-indexes/*.faiss
-indexes/*.pkl
-indexes/*.json
+# Logs
+*.log
 
-# --- Data (escalations are runtime-generated) ---------------------------------
+# Model cache (downloaded automatically on first run)
+# ~/.cache/huggingface/ is used — not in project directory
+
+# Data — escalation records (generated at runtime)
 data/escalations/*.json
 
-# --- Reference Files (not part of the project) --------------------------------
-faiss-main/
-*.pdf
-Documentation requesty.txt
-Suggested references by yellow.ai from the document.txt
-ML-Intern-Assignment.txt
+# Byte-compiled
+*.egg-info/
+dist/
+build/
